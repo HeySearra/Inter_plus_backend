@@ -2,13 +2,11 @@ from django.db import models
 
 
 class Subject(models.Model):
-    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=64)
     intro = models.CharField(max_length=512)
 
 
 class Course(models.Model):
-    id = models.AuthoField(primary_key=True)
     name = models.CharField(max_length=128)
     intro = models.CharField(max_length=512)
     class_count = models.IntegerField
@@ -19,7 +17,6 @@ class Course(models.Model):
 
 
 class Video(models.Model):
-    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=128)
     intro = models.CharField(max_length=512)
     class_id = models.IntegerField
