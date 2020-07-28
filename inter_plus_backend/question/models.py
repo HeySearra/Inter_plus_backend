@@ -49,7 +49,7 @@ class Solution(models.Model):
 
 
 class Choice(models.Model):
-    img = models.ImageField(verbose_name='附加图片', upload_to='question/choices/', null=True, default=None, blank=True)
+    img = models.FileField(verbose_name='附加图片', upload_to='question/choices/', null=True, default=None, blank=True)
     name = models.CharField(verbose_name='选项名', max_length=200, default='NULL')
     if_true = models.BooleanField(verbose_name='是否正确', default=False)
     selected_freq = models.IntegerField(verbose_name='被选次数', default=0)
@@ -79,7 +79,7 @@ class Blank(models.Model):
         ('range', '范围答案'),
     )
     ord = models.IntegerField(verbose_name='设空序号', default=1)
-    img = models.ImageField(verbose_name='附加图片', upload_to='question/blanks', null=True, default=None, blank=True)
+    img = models.FileField(verbose_name='附加图片', upload_to='question/blanks', null=True, default=None, blank=True)
     answer = models.CharField(verbose_name='设空答案', max_length=256)                          # 一空多答案时用&&分隔
     answer_type = models.CharField(verbose_name='答案类型', max_length=16, choices=answer_types)
     total = models.PositiveIntegerField(verbose_name='总回答次数', default=0)
