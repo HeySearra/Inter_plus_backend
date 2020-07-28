@@ -109,3 +109,57 @@ class UploadImage(View):
         with open(file_path, 'wb') as fp:
             [fp.write(c) for c in img.chunks()]
         return file_path, 0
+
+
+class UserInfo(View):
+    @JSR('status')
+    def post(self, request):
+        E = EasyDict()
+        E.uk = -1
+        E.name, E.school, E.company, E.job, E.intro = 1, 2, 3, 4, 5
+
+        kwargs: dict = json.loads(request.body)
+        if kwargs.keys() != {'name', 'sex', 'birthday', 'school', 'company', 'job', 'introduction', 'src'}:
+            return E.uk,
+        u = User.objects.filter(id=request.session['uid'])
+        if not u.exists():
+            return E.uk,
+        u = u.get()
+
+        if not CHECK_NAME(kwargs['name']):
+            return E.name,
+        if str(kwargs['sex']) not in GENDER_DICT.keys():
+            return E.uk,
+        if not CHECK_DESCS(kwargs['school']):
+            return E.school,
+        if not CHECK_DESCS(kwargs['company']):
+            return E.company,
+        if not CHECK_DESCS(kwargs['job']):
+            return E.job,
+        if not CHECK_DESCS(kwargs['introduction']):
+            return E.intro,
+        u.name = kwargs['name']
+        u.gender = kwargs['sex']
+
+        bir = kwargs['birthday']
+        for ch in (_ for _ in bir if not _.isdigit() and _ != '-'):
+            bir = bir.split(ch)[0]
+        u.birthday = datetime.strptime(bir, '%Y-%m-%d').date()
+        u.school = kwargs['school']
+        u.company = kwargs['company']
+        u.job = kwargs['job']
+        u.intro = kwargs['introduction']
+
+        try:
+            u.save()
+        except:
+            return E.uk,
+        return 0,
+
+    @JSR('uid', 'name', 'sex', 'birthday', 'school', 'company', 'job', 'introduction')
+    def get(self, request):
+        u = User.objects.filter(id=request.session['uid'])
+        if not u.exists():
+            return '', '', 2, '', '', '', '', ''
+        u = u.get()
+        return u.id, u.name, int(u.gender), u.birthday.strftime('%Y-%m-%d'), u.school, u.company, u.job, u.intro

@@ -1,8 +1,7 @@
 import os
 import re
 
-# choices
-# from Cuby.settings import MEDIA_ROOT
+from inter_plus_backend.settings import MEDIA_ROOT
 
 GENDER_CHS = (
     ('0', '未知'),
@@ -17,6 +16,7 @@ IDENTITY_CHS = (
 )
 IDENTITY_DICT = {e[0]: e[1] for e in IDENTITY_CHS}
 DEFAULT_PROFILE_ROOT = 'profile'
+DEFAULT_IMG_ROOT = os.path.join(MEDIA_ROOT, 'img')
 MAX_UPLOADED_FSIZE = 1024 * 1024
 FNAME_DEFAULT_LEN = 20
 
