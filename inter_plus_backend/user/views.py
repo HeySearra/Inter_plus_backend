@@ -16,10 +16,6 @@ from user.models import User
 class Register(View):
     @JSR('status')
     def post(self, request):
-        E = EasyDict()
-        E.uk = -1
-        E.acc, E.pwd, E.name, E.uni = 1, 2, 3, 4
-
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'email', 'password', 'name'}:
             return -1,
@@ -114,52 +110,115 @@ class UploadImage(View):
 class UserInfo(View):
     @JSR('status')
     def post(self, request):
-        E = EasyDict()
-        E.uk = -1
-        E.name, E.school, E.company, E.job, E.intro = 1, 2, 3, 4, 5
-
-        kwargs: dict = json.loads(request.body)
-        if kwargs.keys() != {'name', 'sex', 'birthday', 'school', 'company', 'job', 'introduction', 'src'}:
-            return E.uk,
+        name = request.POST.get('name', '')
+        intro = request.POST.get('intro', '')
+        sex = request.POST.get('sex', '')
+        birthday = request.POST.get('birthday', '')
+        school = request.POST.get('school', '')
+        major = request.POST.get('major', '')
+        grade = request.POSt.get('grade', '')
+        img = request.POST.get('img', '')
+        graduate_school = request.POST.get('graduate_school', '')
+        teach_grade = request.POST.get('teach_grade', '')
+        try:
+            if grade != '':
+                grade = int(grade)
+            if teach_grade != '':
+                teach_grade = int(teach_grade)
+        except:
+            return -1
         u = User.objects.filter(id=request.session['uid'])
         if not u.exists():
-            return E.uk,
+            return -1,
         u = u.get()
 
-        if not CHECK_NAME(kwargs['name']):
-            return E.name,
-        if str(kwargs['sex']) not in GENDER_DICT.keys():
-            return E.uk,
-        if not CHECK_DESCS(kwargs['school']):
-            return E.school,
-        if not CHECK_DESCS(kwargs['company']):
-            return E.company,
-        if not CHECK_DESCS(kwargs['job']):
-            return E.job,
-        if not CHECK_DESCS(kwargs['introduction']):
-            return E.intro,
-        u.name = kwargs['name']
-        u.gender = kwargs['sex']
-
-        bir = kwargs['birthday']
-        for ch in (_ for _ in bir if not _.isdigit() and _ != '-'):
-            bir = bir.split(ch)[0]
-        u.birthday = datetime.strptime(bir, '%Y-%m-%d').date()
-        u.school = kwargs['school']
-        u.company = kwargs['company']
-        u.job = kwargs['job']
-        u.intro = kwargs['introduction']
+        if not 0 <= len(name) <= 64:
+            return -1,
+        if sex != '' and str(sex) not in GENDER_DICT.keys():
+            return -1,
+        if not 0 <= len(school) <= 128:
+            return -1,
+        if not 0 <= len(intro) <= 250:
+            return -1,
+        if grade != '' and not 1 <= grade <= 20:
+            return -1,
+        if not 0 <= len(graduate_school) <= 128:
+            return -1,
+        if teach_grade != '' and not 1 <= teach_grade <= 20:
+            return -1,
+        if name != '':
+            u.name = name
+        if intro != '':
+            u.intro = intro
+        if sex != '':
+            u.sex = sex
+        if birthday != '' and re.search(r'^\d{4}-\d{2}-\d{2}$', birthday):
+            u.birthday = datetime.strptime(birthday, '%Y-%m-%d').date()
+        if school != '':
+            u.school = school
+        if major != '':
+            u.major = major
+        if grade != '':
+            u.grade = grade
+        if img != '':
+            u.profile_photo = img
+        if graduate_school != '':
+            u.graduate_school = graduate_school
+        if teach_grade != '':
+            u.teach_grade = teach_grade
 
         try:
             u.save()
         except:
-            return E.uk,
+            return -1,
         return 0,
 
-    @JSR('uid', 'name', 'sex', 'birthday', 'school', 'company', 'job', 'introduction')
+    @JSR('uid', 'name', 'intro', 'sex', 'birthday', 'school', 'major', 'grade', 'img', 'email', 'graduate_school',
+         'teach_grade')
     def get(self, request):
-        u = User.objects.filter(id=request.session['uid'])
-        if not u.exists():
-            return '', '', 2, '', '', '', '', ''
-        u = u.get()
-        return u.id, u.name, int(u.gender), u.birthday.strftime('%Y-%m-%d'), u.school, u.company, u.job, u.intro
+        try:
+            uid = request.GET['id']
+            if uid == 0:
+                u = User.objects.get(id=request.session['uid'])
+            else:
+                u = User.objects.get(id=uid)
+        except:
+            return 0, '', '', 0, '', '', '', 0, '', '', '', 0
+
+        return u.id, u.name, u.intro, int(u.gender), u.birthday.strftime(
+            '%Y-%m-%d'), u.school, u.major, u.grade, u.profile_photo,
+
+
+class ChangePassword(View):
+    @JSR('status')
+    def post(self, request):
+        kwargs: dict = json.loads(request.body)
+        if kwargs.keys() != {'pass_old', 'pass_new', 'email'}:
+            return -1,
+        try:
+            u = User.objects.get(id=request.session['uid'])
+        except:
+            return -1,
+        if u.password != kwargs['pass_old'] or u.email != kwargs['email']:
+            return -1,
+        else:
+            u.password = kwargs['pass_new']
+            try:
+                u.save()
+            except:
+                return -1
+            return 0
+
+
+class GetIdentity(View):
+    @JSR('identity')
+    def get(self, request):
+        try:
+            uid = int(request.GET.get('id'))
+            if uid and uid != 0:
+                u = User.objects.get(id=uid)
+            else:
+                u = User.objects.get(id=request.session['uid'])
+        except:
+            return 0
+        return u.identity

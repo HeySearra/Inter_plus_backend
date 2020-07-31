@@ -9,4 +9,6 @@ urlpatterns = [
 
     ])),
     path('user/', include('user.urls')),
+    path('exercise/', include('exercise.urls')),
+    path('course/', include('course.urls')),
 ]
