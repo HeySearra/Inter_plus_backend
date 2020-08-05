@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from user.views import UploadImage
+from course.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -11,4 +12,5 @@ urlpatterns = [
     path('user/', include('user.urls')),
     path('exercise/', include('exercise.urls')),
     path('course/', include('course.urls')),
+    path('video/info/', )
 ]

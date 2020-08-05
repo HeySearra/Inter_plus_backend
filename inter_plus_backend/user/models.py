@@ -36,3 +36,5 @@ class Apply(models.Model):
     xuexin_img = models.FileField(max_length=512, blank=True, upload_to='xuexin', verbose_name='学信网照片')
     teacher_img = models.FileField(max_length=512, blank=True, upload_to='teacher', verbose_name='教师资格证照片')
     reason = models.CharField(max_length=1024, default='', verbose_name='申请理由')
+
+    author = models.ForeignKey(User, on_delete=models.CASCADE, null=True)

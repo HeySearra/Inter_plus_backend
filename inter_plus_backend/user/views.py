@@ -10,7 +10,7 @@ from user.hypers import *
 from easydict import EasyDict
 from django.views import View
 from django.db.utils import IntegrityError, DataError
-from user.models import User
+from user.models import User, Apply
 
 
 class Register(View):
@@ -222,3 +222,31 @@ class GetIdentity(View):
         except:
             return 0
         return u.identity
+
+
+class ApplyForTeacher(View):
+    @JSR('status')
+    def post(self, request):
+        kwargs: dict = json.loads(request.body)
+        if kwargs.keys() != {'degree', 'graduate_school', 'teach_grade', 'reason', 'img_per', 'img_xue', 'img_tea'}:
+            return -1,
+        app = Apply()
+        try:
+            degree = int(kwargs['degree'])
+            teach_grade = int(kwargs['teach_grade'])
+            u = User.objects.get(id=request.session['uid'])
+        except:
+            return -1
+        if u.identity != '1':   # 不是学生（普通用户）
+            return -1
+        app.degree = degree
+        u.graduate_school = kwargs['graduate_school']
+        app.author = u
+        app.teach_grade = teach_grade
+        app.reason = kwargs['reason']
+        app.idcard_img = kwargs['img_per']
+        app.xuexin_img = kwargs['img_xue']
+        app.teacher_img = kwargs['img_tea']
+        app.save()
+        u.save()
+        return 0

@@ -7,7 +7,7 @@ class Exercise(models.Model):
     level = models.IntegerField(verbose_name='难度', default=0)    # 简单1，中等2，困难3，若不分，为0
     create_time = models.TimeField(verbose_name='创建时间', auto_now_add=True)
     class_id = models.IntegerField(default=0)   # 该课程的哪个课时
-    video_id = models.IntegerField(verbose_name='下个视频的id', default=0, blank=True)   # 即下一个课时的开始的视频
+    next_video_id = models.IntegerField(verbose_name='下个视频的id', default=0, blank=True)   # 即下一个课时的开始的视频
 
     course = models.ForeignKey('course.Course', related_name='related_exercise', verbose_name='所属课程', on_delete=models.CASCADE, blank=True)
 
@@ -56,9 +56,8 @@ class Stem(models.Model):
 class Video(models.Model):
     name = models.CharField(max_length=128)
     intro = models.CharField(max_length=512)
-    class_id = models.IntegerField
-    video_id = models.IntegerField
-    src = models.CharField(max_length=512)
+    class_id = models.IntegerField(default=0)   # 课时数
+    src = models.CharField(max_length=512)  # 视频链接
     course = models.ForeignKey('course.Course', on_delete=models.CASCADE)
     questions = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='related_video')
 
