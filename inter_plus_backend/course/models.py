@@ -9,6 +9,14 @@ class Subject(models.Model):
         ordering = ['-name']
 
 
+class JoinCourseMembership(models.Model):
+    course = models.ForeignKey('Course', on_delete=models.CASCADE)
+    student = models.ForeignKey('user.User', on_delete=models.CASCADE)
+
+    join_time = models.DateTimeField(auto_now_add=True, verbose_name='加入时间', blank=True, null=True)
+    level = models.IntegerField(default=0)  # 0不分，1简单，2中等
+
+
 class Course(models.Model):
     name = models.CharField(max_length=128)
     intro = models.CharField(max_length=512)
@@ -22,7 +30,7 @@ class Course(models.Model):
     author = models.ForeignKey('user.User', on_delete=models.CASCADE, related_name='have_course')
     subject = models.ForeignKey('Subject', on_delete=models.CASCADE, related_name='related_course')
     who_like = models.ManyToManyField('user.User', related_name='like_course')
-    who_join = models.ManyToManyField('user.User', related_name='join_course')
+    join = models.ManyToManyField('user.User', through=JoinCourseMembership, through_fields=('course', 'student'))
 
 
 class Note(models.Model):

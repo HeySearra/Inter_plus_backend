@@ -86,10 +86,10 @@ class GetCourseList(View):
                 'author_id': c.author_id,
                 'author_name': c.author.name,
                 'subject_id': c.subject_id,
-                'who_like_ids': [a.id for a in c.who_like.all()],
-                'who_join_ids': [a.id for a in c.who_join.all()],
-                'exercise_ids': [],
-                'video_ids': [],
+                'subject_name': c.subject_name,
+                'like_count': c.who_like.count(),
+                'join_count': JoinCourseMembership.objects.filter(course=c).count(),
+                'is_join': -1 if not request.session.get('uid', None) else 1 if JoinCourseMembership.objects.filter(course=c, student_id=request.session['uid']).exists() else 0
             }for c in cs]
         ),
 
@@ -114,22 +114,24 @@ class GetUserCourseList(View):
             return [], [],
         if id == 0:
             try:
-                id = request.session['id']
+                id = request.session['uid']
             except:
                 return [], []
-        cset = User.objects.get(id=id).join_course.all()
+        cset = [a.course for a in JoinCourseMembership.objects.filter(student_id=id)]
         courses = [{
-            'id': a.id,
-            'name': a.name,
-            'intro': a.intro,
-            'class_count': a.class_count,
-            'class_img': '/store' + a.class_img.path.split('store')[1],
-            'author_id': a.author_id,
-            'subject_id': a.subject_id,
-            'who_like_ids': [b.id for b in a.who_like.all()],
-            'exercise_ids': get_exercise_ids(a),
-            'video_ids':a.video_id_set.split('&&'),
-        }for a in cset]
+            'id': c.id,
+            'name': c.name,
+            'intro': c.intro,
+            'class_count': c.class_count,
+            'class_img': c.class_img,
+            'author_id': c.author_id,
+            'author_name': c.author.name,
+            'subject_id': c.subject_id,
+            'subject_name': c.subject_name,
+            'like_count': c.who_like.count(),
+            'join_count': JoinCourseMembership.objects.filter(course=c).count(),
+            'is_like': 1 if id in [a.id for a in c.who_like.all()] else 0,
+        }for c in cset]
         return courses
 
 
@@ -198,7 +200,7 @@ class CourseInfo(View):
             c = Course.objects.get(id=int(request.GET.get('id')))
         except:
             return '', '', 0, '', 0, 0, '', 0, 0, -1, -1, [], [], [], []
-
+        # exercise_ids =
 
 
 class LikeCourse(View):
