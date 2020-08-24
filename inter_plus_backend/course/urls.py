@@ -10,4 +10,5 @@ urlpatterns = [
     path('info/', CourseInfo.as_view()),
     path('join/', JoinCourse.as_view()),
     path('like/', LikeCourse.as_view()),
+    path('class_info/', ClassInfo.as_view()),
 ]

@@ -6,7 +6,7 @@ class Exercise(models.Model):
     intro = models.CharField(verbose_name='练习介绍', max_length=128, default='')
     level = models.IntegerField(verbose_name='难度', default=0)    # 简单1，中等2，困难3，若不分，为0
     create_time = models.TimeField(verbose_name='创建时间', auto_now_add=True)
-    class_id = models.IntegerField(default=0)   # 该课程的哪个课时
+    class_id = models.IntegerField(default=0)   # 该课程的哪个课时，等于0为课前测试
     next_video_id = models.IntegerField(verbose_name='下个视频的id', default=0, blank=True)   # 即下一个课时的开始的视频
 
     course = models.ForeignKey('course.Course', related_name='related_exercise', verbose_name='所属课程', on_delete=models.CASCADE, blank=True)
@@ -36,7 +36,6 @@ class Question(models.Model):
     difficulty = models.IntegerField(default=1)  # 1易，2中，3难
 
     tags = models.ManyToManyField(Tag)
-
     exercise = models.ForeignKey('exercise.Exercise', related_name='related_question', on_delete=models.CASCADE, blank=True)
     answer_record = models.ManyToManyField('user.User', through='Record', through_fields=('question', 'user'), blank=True)
 
@@ -47,19 +46,21 @@ class Question(models.Model):
 class Stem(models.Model):
     types = (('0', 'img'),
              ('1', 'markdown'))
-    img = models.CharField(verbose_name='附加图片', max_length=4096, default='')
     type = models.CharField(verbose_name='题干类型', max_length=256, choices=types, default="")
+    text = models.TextField(verbose_name='md代码')
+    img = models.CharField(verbose_name='附加图片', max_length=4096, default='')
 
     question = models.ForeignKey('Question', on_delete=models.CASCADE, related_name='stems')
 
 
 class Video(models.Model):
     name = models.CharField(max_length=128)
-    intro = models.CharField(max_length=512)
+    intro = models.CharField(max_length=512)    # 视频介绍
     class_id = models.IntegerField(default=0)   # 课时数
     src = models.CharField(max_length=512)  # 视频链接
+
     course = models.ForeignKey('course.Course', on_delete=models.CASCADE)
-    questions = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='related_video')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='related_video')
 
 
 class Solution(models.Model):
