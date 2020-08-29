@@ -45,3 +45,6 @@ class Note(models.Model):
 
     author = models.ForeignKey('user.User', related_name="related_note", on_delete=models.CASCADE)
     course = models.ForeignKey(Course, related_name='related_note', on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['class_id']

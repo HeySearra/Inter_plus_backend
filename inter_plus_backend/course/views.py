@@ -366,3 +366,24 @@ class ClassInfo(View):
                c.who_like.count(), JoinCourseMembership.objects.filter(course=c).count(), join.level, dic['class_name'], dic[
                    'exercise_level'], dic['exercise_id'], dic['exercise_easy_id'], dic['exercise_middle_id'], dic[
                    'exercise_hard_id'], dic['video_id'], dic['note_id'],
+
+
+class NoteInfo(View):
+    @JSR('note')
+    def get(self, request):
+        try:
+            uid = request.GET.get('user_id', 0)
+            if uid == 0:
+                uid = request.session['uid']
+            note = Note.objects.filter(author_id=uid, course_id=request.GET.get('course_id'))
+        except:
+            return []
+        res = []
+        for i in note:
+            res.append({'id': i.id,
+                        'title': i.title,
+                        'text': i.content,
+                        'class_id': i.class_id})
+        return res
+
+    # def post(self, request):
