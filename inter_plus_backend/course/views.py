@@ -18,7 +18,7 @@ from datetime import datetime, date
 
 class GetSubjectList(View):
     @JSR('subject')
-    def get(self, request):
+    def post(self, request):
         su = Subject.objects.all()
         a = []
         for i in su:
