@@ -29,8 +29,8 @@ class Course(models.Model):
     create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间', blank=True, null=True)
     class_img = models.ImageField(upload_to='class_img/', null=True, verbose_name='课程封面')
 
-    author = models.ForeignKey('user.User', on_delete=models.CASCADE, related_name='have_course')
-    subject = models.ForeignKey('Subject', on_delete=models.CASCADE, related_name='related_course')
+    author = models.ForeignKey('user.User', on_delete=models.CASCADE, related_name='have_course', null=True)
+    subject = models.ForeignKey('Subject', on_delete=models.CASCADE, related_name='related_course', null=True)
     who_like = models.ManyToManyField('user.User', related_name='like_course')
     join = models.ManyToManyField('user.User', through=JoinCourseMembership, through_fields=('course', 'student'))
 
@@ -43,8 +43,8 @@ class Note(models.Model):
     edit_time = models.DateTimeField(verbose_name="修改时间", auto_now_add=True)
     recycle_time = models.DateTimeField(verbose_name="删除时间", null=True)
 
-    author = models.ForeignKey('user.User', related_name="related_note", on_delete=models.CASCADE)
-    course = models.ForeignKey(Course, related_name='related_note', on_delete=models.CASCADE)
+    author = models.ForeignKey('user.User', related_name="related_note", on_delete=models.CASCADE, null=True)
+    course = models.ForeignKey(Course, related_name='related_note', on_delete=models.CASCADE, null=True)
 
     class Meta:
         ordering = ['class_id']

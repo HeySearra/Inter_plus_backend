@@ -37,7 +37,7 @@ class Question(models.Model):
     level = models.IntegerField(default=1)  # 1易，2中，3难
 
     tags = models.ManyToManyField(Tag)
-    exercise = models.ForeignKey('exercise.Exercise', related_name='related_question', on_delete=models.CASCADE, blank=True)
+    exercise = models.ForeignKey('exercise.Exercise', related_name='related_question', on_delete=models.CASCADE, null=True)
 
     class Meta:
         ordering = ['-create_time']
@@ -85,7 +85,7 @@ class Choice(models.Model):
     if_true = models.BooleanField(verbose_name='是否正确', default=False)
     selected_freq = models.IntegerField(verbose_name='被选次数', default=0)
 
-    question = models.ForeignKey('Question', on_delete=models.CASCADE, related_name='choices')
+    question = models.ForeignKey('Question', on_delete=models.CASCADE, related_name='choices', null=True)
     video = models.ForeignKey('Video', on_delete=models.CASCADE, related_name='related_choices', null=True)
 
     class Meta:
@@ -100,7 +100,7 @@ class Blank(models.Model):
     total = models.PositiveIntegerField(verbose_name='总回答次数', default=0)
     correct_freq = models.PositiveIntegerField(verbose_name='正确回答次数', default=0)
 
-    question = models.ForeignKey('Question', on_delete=models.CASCADE, related_name='blanks')
+    question = models.ForeignKey('Question', on_delete=models.CASCADE, related_name='blanks', null=True)
 
     class Meta:
         ordering = ['-id']
@@ -117,6 +117,6 @@ class SubjectQuestionAnswer(models.Model):
 
 
 class WrongQuestion(models.Model):
-    user = models.ForeignKey('user.User', on_delete=models.CASCADE, related_name='wrong_question_book')
+    user = models.ForeignKey('user.User', on_delete=models.CASCADE, related_name='wrong_question_book', null=True)
     question = models.ManyToManyField('Question', related_name='wrong_question')
-    course = models.ForeignKey('course.Course', on_delete=models.CASCADE)
+    course = models.ForeignKey('course.Course', on_delete=models.CASCADE, null=True)
