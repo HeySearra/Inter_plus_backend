@@ -9,7 +9,7 @@ class Exercise(models.Model):
     class_id = models.IntegerField(default=0)   # 该课程的哪个课时，等于0为课前测试
     next_video_id = models.IntegerField(verbose_name='下个视频的id', default=0, blank=True)   # 即下一个课时的开始的视频
 
-    course = models.ForeignKey('course.Course', related_name='related_exercise', verbose_name='所属课程', on_delete=models.CASCADE, blank=True)
+    course = models.ForeignKey('course.Course', related_name='related_exercise', verbose_name='所属课程', on_delete=models.CASCADE, null=True)
     record = models.ManyToManyField('user.User', through='Record', through_fields=('exercise', 'user'))
 
 
