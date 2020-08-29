@@ -1,4 +1,3 @@
-import simplejson
 from django.db.models import QuerySet, Q
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
@@ -14,7 +13,6 @@ import os
 import random
 import string
 from datetime import datetime, date
-from dateutil.relativedelta import relativedelta
 
 
 class CourseExerciseList(View):

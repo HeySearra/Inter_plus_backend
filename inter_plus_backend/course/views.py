@@ -14,7 +14,6 @@ import os
 import random
 import string
 from datetime import datetime, date
-from dateutil.relativedelta import relativedelta
 
 
 class GetSubjectList(View):

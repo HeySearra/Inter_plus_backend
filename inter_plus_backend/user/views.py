@@ -5,7 +5,6 @@ import os
 import random
 import string
 from datetime import datetime, date
-from dateutil.relativedelta import relativedelta
 from user.hypers import *
 from easydict import EasyDict
 from django.views import View
