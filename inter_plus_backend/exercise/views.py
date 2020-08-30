@@ -120,7 +120,7 @@ class GetWrongQuestion(View):
             "questions": [],
         }
         try:
-            wb = WrongQuestion.objects.get(user_id=request.session['uid'], course_id=request.POST.get('course_id'))
+            wb = WrongQuestion.objects.get(user__token=request.META.get('HTTP_AUTHORIZATION', None), course_id=request.POST.get('course_id'))
         except:
             return JsonResponse(package)
         package['count'] = wb.question.count()

@@ -10,6 +10,8 @@ from easydict import EasyDict
 from django.views import View
 from django.db.utils import IntegrityError, DataError
 from user.models import User, Apply
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 
 class Register(View):
@@ -44,8 +46,8 @@ class Register(View):
 class Login(View):
     @JSR('status')
     def post(self, request):
-        if request.session.get('is_login', None):
-            u = User.objects.get(request.session['uid'])
+        if request.META.get('HTTP_AUTHORIZATION', None):
+            u = User.objects.get(token=request.META.get('HTTP_AUTHORIZATION'))
             if u.login_date != date.today():
                 u.login_date = date.today()
                 u.point += 5
@@ -71,11 +73,13 @@ class Login(View):
         if u.password != kwargs['password']:
             return -1
 
-        request.session['is_login'] = True
-        request.session['uid'] = u.id
-        request.session['name'] = u.name
-        request.session['identity'] = u.identity
-        request.session.save()
+        # request.session['is_login'] = True
+        # request.session['uid'] = u.id
+        # request.session['name'] = u.name
+        # request.session['identity'] = u.identity
+        # request.session.save()
+        u.token = ''.join([random.choice(string.ascii_letters + string.digits)
+                             for _ in range(25)])
         try:
             u.save()
         except:
@@ -84,8 +88,10 @@ class Login(View):
 
     @JSR('status')
     def get(self, request):
-        if request.session.get('is_login', None):
-            request.session.flush()
+        if request.session.get('HTTP_AUTHORIZATION', False):
+            u = User.objects.get(token=request.META.get('HTTP_AUTHORIZATION', False))
+            u.token = ''
+            u.save()
             return 0
         else:
             return -1
@@ -126,7 +132,7 @@ class UserInfo(View):
                 teach_grade = int(teach_grade)
         except:
             return -1
-        u = User.objects.filter(id=request.session['uid'])
+        u = User.objects.filter(token=request.META.get('HTTP_AUTHORIZATION', None))
         if not u.exists():
             return -1,
         u = u.get()
@@ -176,9 +182,9 @@ class UserInfo(View):
          'teach_grade')
     def get(self, request):
         try:
-            uid = request.GET['id']
+            uid = int(request.GET['id'])
             if uid == 0:
-                u = User.objects.get(id=request.session['uid'])
+                u = User.objects.get(token=request.META.get('HTTP_AUTHORIZATION', None))
             else:
                 u = User.objects.get(id=uid)
         except:
@@ -195,7 +201,7 @@ class ChangePassword(View):
         if kwargs.keys() != {'pass_old', 'pass_new', 'email'}:
             return -1,
         try:
-            u = User.objects.get(id=request.session['uid'])
+            u = User.objects.get(token=request.META.get('HTTP_AUTHORIZATION', None))
         except:
             return -1,
         if u.password != kwargs['pass_old'] or u.email != kwargs['email']:
@@ -217,7 +223,7 @@ class GetIdentity(View):
             if uid and uid != 0:
                 u = User.objects.get(id=uid)
             else:
-                u = User.objects.get(id=request.session['uid'])
+                u = User.objects.get(token=request.META.get('HTTP_AUTHORIZATION', None))
         except:
             return 0
         return u.identity
@@ -233,7 +239,7 @@ class ApplyForTeacher(View):
         try:
             degree = int(kwargs['degree'])
             teach_grade = int(kwargs['teach_grade'])
-            u = User.objects.get(id=request.session['uid'])
+            u = User.objects.get(token=request.META.get('HTTP_AUTHORIZATION', None))
         except:
             return -1
         if u.identity != '1':   # 不是学生（普通用户）

@@ -90,9 +90,8 @@ class GetCourseList(View):
                        'subject_name': c.subject_name,
                        'like_count': c.who_like.count(),
                        'join_count': JoinCourseMembership.objects.filter(course=c).count(),
-                       'is_join': -1 if not request.session.get('uid',
-                                                                None) else 1 if JoinCourseMembership.objects.filter(
-                           course=c, student_id=request.session['uid']).exists() else 0
+                       'is_join': -1 if not request.META.get('HTTP_AUTHORIZATION', None) else 1 if JoinCourseMembership.objects.filter(
+                           course=c, student__token=request.META.get('HTTP_AUTHORIZATION', None)).exists() else 0
                    } for c in cs]
                ),
 
@@ -107,10 +106,10 @@ class GetUserCourseList(View):
             return [], [],
         if id == 0:
             try:
-                id = request.session['uid']
+                token = request.META['HTTP_AUTHORIZATION']
             except:
                 return [], []
-        cset = [a.course for a in JoinCourseMembership.objects.filter(student_id=id)]
+        cset = [a.course for a in JoinCourseMembership.objects.filter(student__token=token)]
         courses = [{
             'id': c.id,
             'name': c.name,
@@ -123,7 +122,7 @@ class GetUserCourseList(View):
             'subject_name': c.subject_name,
             'like_count': c.who_like.count(),
             'join_count': JoinCourseMembership.objects.filter(course=c).count(),
-            'is_like': 1 if id in [a.id for a in c.who_like.all()] else 0,
+            'is_like': 1 if token in [a.token for a in c.who_like.all()] else 0,
         } for c in cset]
         return courses
 
@@ -157,8 +156,8 @@ class GetCourseUserNoteList(View):
     @JSR('courses')
     def get(self, request):
         try:
-            user = User.objects.get(request.session['uid'])
-            c = Course.objects.get(request.GET.get('course_id'))
+            user = User.objects.get(token=request.META.get('HTTP_AUTHORIZATION', None))
+            c = Course.objects.get(id=request.GET.get('course_id'))
         except:
             return []
         note_set = sorted([a for a in Note.objects.filter(author=user, course=c)], key=lambda e: e.class_id)
@@ -218,12 +217,12 @@ class CourseInfo(View):
         video_id = c.video_id_set.split('&&')
         note_id = c.note_id_set.split('&&')
         exercise_level = c.exercise_level_set.split('&&')
-        is_join = -1 if not request.session.get('uid', None) else 1 if JoinCourseMembership.objects.filter(
-            course=c, student_id=request.session['uid']).exists() else 0
-        is_like = -1 if not request.session.get('uid', None) else 1 if int(request.session['uid']) in [a.id for a in
+        is_join = -1 if not request.META.get('HTTP_AUTHORIZATION', None) else 1 if JoinCourseMembership.objects.filter(
+            course=c, student__token=request.META.get('HTTP_AUTHORIZATION', None)).exists() else 0
+        is_like = -1 if not request.META.get('HTTP_AUTHORIZATION', None) else 1 if request.META.get('HTTP_AUTHORIZATION', None) in [a.token for a in
                                                                                                        c.who_like.all()] else 0
         if is_join == 1 and c.level == 1:  # 用户加入了课程且区分用户难度
-            join = JoinCourseMembership.objects.get(course=c, student_id=request.session['uid'])
+            join = JoinCourseMembership.objects.get(course=c, student__token=request.META.get('HTTP_AUTHORIZATION', None))
             user_level = join.level
         elif c.level == 0:
             user_level = 0
@@ -254,8 +253,8 @@ class CourseInfo(View):
                     course=c, level=2).exists() else 0
                 dic['exercise_hard_id'] = Exercise.objects.get(course=c, level=3).id if Exercise.objects.filter(
                     course=c, level=3).exists() else 0
-            if is_join == 1 and Note.objects.filter(course=c, author_id=request.session['uid'], class_id=i).exists():
-                dic['note_id'] = Note.objects.get(course=c, author_id=request.session['uid'], class_id=i).id
+            if is_join == 1 and Note.objects.filter(course=c, author__token=request.META.get('HTTP_AUTHORIZATION', None), class_id=i).exists():
+                dic['note_id'] = Note.objects.get(course=c, author__token=request.META.get('HTTP_AUTHORIZATION', None), class_id=i).id
             else:
                 dic['note_id'] = note_id[i - 1]
             classes.append(dic)
@@ -282,7 +281,7 @@ class LikeCourse(View):
             form = simplejson.loads(request.body)
             c = Course.objects.get(id=int(form['course_id']))
             op = int(form['op'])
-            user = User.objects.get(id=request.session['uid'])
+            user = User.objects.get(token=request.META.get('HTTP_AUTHORIZATION', None))
         except:
             return -1, 0
         if op == 1 and user not in c.who_like.all():
@@ -302,7 +301,7 @@ class JoinCourse(View):
             form = simplejson.loads(request.body)
             c = Course.objects.get(id=int(form['course_id']))
             op = int(form['op'])
-            user = User.objects.get(id=request.session['uid'])
+            user = User.objects.get(token=request.META.get('HTTP_AUTHORIZATION', None))
         except:
             return -1, 0
         join = JoinCourseMembership.objects.filter(course=c, student=user)
@@ -323,7 +322,7 @@ class ClassInfo(View):
         try:
             c = Course.objects.get(id=int(request.GET.get('course_id')))
             class_index = int(request.GET.get('class_id'))
-            user = User.objects.get(id=request.session['uid'])
+            user = User.objects.get(token=request.META.get('HTTP_AUTHORIZATION', None))
         except:
             return '', '', 0, 0, '', 0, '', 0, 0, 0, '', 0, 0, 0, 0, 0, 0, 0,
         join = JoinCourseMembership.objects.filter(course=c, student=user)
@@ -357,8 +356,8 @@ class ClassInfo(View):
                 course=c, level=2).exists() else 0
             dic['exercise_hard_id'] = Exercise.objects.get(course=c, level=3).id if Exercise.objects.filter(
                 course=c, level=3).exists() else 0
-        if Note.objects.filter(course=c, author_id=request.session['uid'], class_id=class_index).exists():
-            dic['note_id'] = Note.objects.get(course=c, author_id=request.session['uid'], class_id=class_index).id
+        if Note.objects.filter(course=c, author__token=request.META.get('HTTP_AUTHORIZATION', None), class_id=class_index).exists():
+            dic['note_id'] = Note.objects.get(course=c, author__token=request.META.get('HTTP_AUTHORIZATION', None), class_id=class_index).id
         else:
             dic['note_id'] = note_id[class_index - 1]
         return c.name, c.intro, c.class_count, c.author_id, c.author.name, c.subject_id, c.subject.name, \
@@ -373,7 +372,7 @@ class NoteInfo(View):
         try:
             uid = request.GET.get('user_id', 0)
             if uid == 0:
-                uid = request.session['uid']
+                uid = User.objects.get(token=request.META.get('HTTP_AUTHORIZATION', None)).id
             note = Note.objects.filter(author_id=uid, course_id=request.GET.get('course_id'))
         except:
             return []

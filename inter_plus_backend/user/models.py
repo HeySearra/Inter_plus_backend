@@ -22,6 +22,7 @@ class User(models.Model):
     identity = models.CharField(max_length=128, verbose_name='身份', choices=identities, default='1')
     school = models.CharField(max_length=256, default='', verbose_name='学校')
     grade = models.IntegerField(default=0, verbose_name='年级')   # 若为教师，为学位
+    token = models.CharField(max_length=40, default='')
 
     major = models.CharField(max_length=128, default='', verbose_name='专业')
     graduate_school = models.CharField(max_length=128, default='', verbose_name='教师的毕业院校')

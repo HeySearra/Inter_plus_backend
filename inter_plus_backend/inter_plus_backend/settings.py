@@ -141,7 +141,6 @@ CORS_ORIGIN_ALLOW_ALL = True
 #     'localhost:8000',  # 请求的域名(此处仅在CORS_ORIGIN_ALLOW_ALL = False时有效)
 # )
 
-
 # 定义允许的匹配路径正则表达式
 CORS_URLS_REGEX = '^.*$'
 
@@ -158,13 +157,15 @@ CORS_ALLOW_METHODS = (
 
 # 设置允许的header
 CORS_ALLOW_HEADERS = (
-    'accept',
+    'XMLHttpRequest',
+    'X_FILENAME',
     'accept-encoding',
     'authorization',
-    'Content-Type',
+    'content-type',
     'dnt',
     'origin',
     'user-agent',
     'X-CSRFToken',
     'x-requested-with',
+    'Pragma',
 )
