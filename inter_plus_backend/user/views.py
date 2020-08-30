@@ -48,16 +48,6 @@ class Login(View):
     def post(self, request):
         if request.META.get('HTTP_AUTHORIZATION', None):
             u = User.objects.get(token=request.META.get('HTTP_AUTHORIZATION'))
-            if u.login_date != date.today():
-                u.login_date = date.today()
-                u.point += 5
-                u.wrong_count = 0
-                try:
-                    u.save()
-                except:
-                    return -1
-            return 0
-
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'email', 'password'}:
             return -1
