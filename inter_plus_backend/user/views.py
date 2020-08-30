@@ -15,7 +15,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 
 
 class Register(View):
-    @JSR('status')
+    @JSR('status', 'token')
     def post(self, request):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'email', 'password', 'name'}:
@@ -37,10 +37,13 @@ class Register(View):
             return -1,  # 诸如某个CharField超过了max_len的错误
         except:
             return -1,
-        request.session['is_login'] = True
-        request.session['uid'] = u.id
-        request.session.save()
-        return 0,
+        # request.session['is_login'] = True
+        # request.session['uid'] = u.id
+        # request.session.save()
+        u.token = ''.join([random.choice(string.ascii_letters + string.digits)
+                             for _ in range(25)])
+        u.save()
+        return 0, u.token
 
 
 class Login(View):
@@ -78,8 +81,8 @@ class Login(View):
 
     @JSR('status')
     def get(self, request):
-        if request.session.get('HTTP_AUTHORIZATION', False):
-            u = User.objects.get(token=request.META.get('HTTP_AUTHORIZATION', False))
+        if request.META.get('HTTP_AUTHORIZATION', None):
+            u = User.objects.get(token=request.META.get('HTTP_AUTHORIZATION', None))
             u.token = ''
             u.save()
             return 0
