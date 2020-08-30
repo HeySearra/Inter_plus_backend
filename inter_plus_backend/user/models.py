@@ -18,7 +18,8 @@ class User(models.Model):
     email = models.EmailField(max_length=254, unique=True, verbose_name='邮箱')
     sex = models.CharField(max_length=8, verbose_name='性别', default='0', choices=genders)
     create_time = models.DateTimeField(blank=True, auto_now_add=True, verbose_name='创建时间')
-    profile_photo = models.FileField(max_length=512, blank=True, upload_to='profile', verbose_name="头像")
+    birthday = models.DateTimeField(blank=True, null=True, verbose_name='创建时间')
+    profile_photo = models.CharField(max_length=512, blank=True, verbose_name="头像")
     identity = models.CharField(max_length=128, verbose_name='身份', choices=identities, default='1')
     school = models.CharField(max_length=256, default='', verbose_name='学校')
     grade = models.IntegerField(default=0, verbose_name='年级')   # 若为教师，为学位

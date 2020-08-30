@@ -190,8 +190,8 @@ class UserInfo(View):
         except:
             return 0, '', '', 0, '', '', '', 0, '', '', '', 0
 
-        return u.id, u.name, u.intro, int(u.gender), u.birthday.strftime(
-            '%Y-%m-%d'), u.school, u.major, u.grade, u.profile_photo,
+        return u.id, u.name, u.intro, int(u.sex), u.birthday.strftime(
+            '%Y-%m-%d') if u.birthday is not None else '', u.school, u.major, u.grade, u.profile_photo,
 
 
 class ChangePassword(View):
