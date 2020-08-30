@@ -50,7 +50,12 @@ class Login(View):
     @JSR('status', 'token')
     def post(self, request):
         if request.META.get('HTTP_AUTHORIZATION', None):
-            u = User.objects.get(token=request.META.get('HTTP_AUTHORIZATION'))
+            u = User.objects.filter(token=request.META.get('HTTP_AUTHORIZATION'))
+            if u.exists():
+                u.token = ''.join([random.choice(string.ascii_letters + string.digits)
+                             for _ in range(25)])
+                u.save()
+                return 0, u.token
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'email', 'password'}:
             return -1
@@ -66,11 +71,6 @@ class Login(View):
         if u.password != kwargs['password']:
             return -1
 
-        # request.session['is_login'] = True
-        # request.session['uid'] = u.id
-        # request.session['name'] = u.name
-        # request.session['identity'] = u.identity
-        # request.session.save()
         u.token = ''.join([random.choice(string.ascii_letters + string.digits)
                              for _ in range(25)])
         try:
