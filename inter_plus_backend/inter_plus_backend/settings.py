@@ -15,7 +15,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # 前端路径
 FRONTEND_ROOT = 'frontend/dist'
 # 静态资源地址
-STATIC_URL = 'frontend/dist/static/'
+STATIC_URL = '/static/'
 
 # 模块资源引用地址
 STATICFILES_DIRS = (
