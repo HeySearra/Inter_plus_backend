@@ -11,9 +11,18 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
-
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# 前端路径
+FRONTEND_ROOT = 'frontend/dist'
+# 静态资源地址
+STATIC_URL = '/static/'
+
+# 模块资源引用地址
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, FRONTEND_ROOT),
+    os.path.join(BASE_DIR, FRONTEND_ROOT + '/static/'),
+)
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 MEDIA_ROOT = '/root/Inter_plus_backend/inter_plus_backend/frontend/dist/static/upload'
 MEDIA_URL = f'/{MEDIA_ROOT}/'
 
@@ -60,7 +69,7 @@ ROOT_URLCONF = 'inter_plus_backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['frontend/dist'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -127,8 +136,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
-
-STATIC_URL = '/static/'
 
 # 跨域增加忽略
 
