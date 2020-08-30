@@ -21,22 +21,22 @@ class Register(View):
         if kwargs.keys() != {'email', 'password', 'name'}:
             return -1,
         if '@' not in kwargs['email']:
-            return -1,
+            return -2,
         if not CHECK_PWD(kwargs['password']):
-            return -1,
+            return -3,
         if not CHECK_NAME(kwargs['name']):
-            return -1,
+            return -4,
 
         kwargs.update({'profile_photo': 'http://47.96.109.229:8000/static/upload/portrait/handsome.jpg'})
 
         try:
             u = User.objects.create(**kwargs)
         except IntegrityError:
-            return -1,  # 字段unique未满足
+            return -5,  # 字段unique未满足
         except DataError:
-            return -1,  # 诸如某个CharField超过了max_len的错误
+            return -6,  # 诸如某个CharField超过了max_len的错误
         except:
-            return -1,
+            return -7,
         # request.session['is_login'] = True
         # request.session['uid'] = u.id
         # request.session.save()
