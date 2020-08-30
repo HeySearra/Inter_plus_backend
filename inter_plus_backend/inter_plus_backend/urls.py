@@ -1,10 +1,13 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
+from django.views.generic import TemplateView
+
 from course.views import *
 from user.views import *
 from exercise.views import *
 
 urlpatterns = [
+    path('', TemplateView.as_view(template_name="index.html"), name='index'),
     path('admin', admin.site.urls),
     path('upload/', include([
         path('pic', UploadImage.as_view()),
@@ -40,4 +43,6 @@ urlpatterns = [
     ])),
     path('video/info', VideoInfo.as_view()),
     path('note/info', NoteInfo.as_view()),
+
+    re_path(r'.*', TemplateView.as_view(template_name='index.html')),
 ]
