@@ -14,8 +14,8 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MEDIA_ROOT = os.path.join(BASE_DIR, 'store')
-MEDIA_URL = '/store/'
+MEDIA_ROOT = '/root/Inter_plus_backend/inter_plus_backend/frontend/dist/static/upload'
+MEDIA_URL = f'/{MEDIA_ROOT}/'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -26,7 +26,7 @@ SECRET_KEY = 'n_x09f%g)#qu5uyf@3xkjn=rg^0fo8t*kc^_5t3jg+3k#dvs(@'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition

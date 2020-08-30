@@ -27,7 +27,7 @@ class Register(View):
         if not CHECK_NAME(kwargs['name']):
             return -1,
 
-        kwargs.update({'profile_photo': DEFAULT_PROFILE_ROOT + '\handsome.jpg'})
+        kwargs.update({'profile_photo': 'http://47.96.109.229:8000/static/upload/portrait/handsome.jpg'})
 
         try:
             u = User.objects.create(**kwargs)
@@ -102,7 +102,7 @@ class UploadImage(View):
         file_path = os.path.join(DEFAULT_IMG_ROOT, file_name)
         with open(file_path, 'wb') as fp:
             [fp.write(c) for c in img.chunks()]
-        return file_path, 0
+        return 'http://47.96.109.229:8000/static/upload/portrait/' + file_name, 0
 
 
 class UserInfo(View):
