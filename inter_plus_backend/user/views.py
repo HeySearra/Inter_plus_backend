@@ -44,7 +44,7 @@ class Register(View):
 
 
 class Login(View):
-    @JSR('status')
+    @JSR('status', 'token')
     def post(self, request):
         if request.META.get('HTTP_AUTHORIZATION', None):
             u = User.objects.get(token=request.META.get('HTTP_AUTHORIZATION'))
@@ -84,7 +84,7 @@ class Login(View):
             u.save()
         except:
             return -1
-        return 0
+        return 0, u.token
 
     @JSR('status')
     def get(self, request):
