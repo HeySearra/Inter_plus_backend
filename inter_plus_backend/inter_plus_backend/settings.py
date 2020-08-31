@@ -91,9 +91,9 @@ WSGI_APPLICATION = 'inter_plus_backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'inter_plus',
+        'NAME': 'pro',
         'USER': 'root',
-        'PASSWORD': '',
+        'PASSWORD': 'admin',
         'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {'charset': 'utf8mb4'},
@@ -120,6 +120,12 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+MEDIA_KEY_PREFIX = "/media/"
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+MEDIA_URL = '/media/'
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
